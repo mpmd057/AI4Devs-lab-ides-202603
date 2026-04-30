@@ -24,21 +24,29 @@ cd AI4Devs-LTI-extended
 Create environment files for both backend and frontend:
 
 **Backend Environment** (`backend/.env`):
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=LTIdbUser
-DB_PASSWORD=D1ymf8wyQEGthFR1E9xhCq
-DB_NAME=LTIdb
 
+Prisma reads **`DATABASE_URL`** only (see `backend/prisma/schema.prisma`). Use a single URL that matches Docker Compose: host port **5433** maps to PostgreSQL **5432** inside the container.
+
+```env
 # Application Configuration
 PORT=3000
 NODE_ENV=development
 
-# Prisma Database URL
-DATABASE_URL="postgresql://LTIdbUser:D1ymf8wyQEGthFR1E9xhCq@localhost:5432/LTIdb"
+# Prisma (required): user, password, host, port, database — use 127.0.0.1:5433 for local Compose
+DATABASE_URL="postgresql://LTIdbUser:D1ymf8wyQEGthFR1E9xhCq@127.0.0.1:5433/LTIdb"
 ```
+
+Optional legacy split variables (not used by Prisma unless your code reads them):
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=5433
+DB_USER=LTIdbUser
+DB_PASSWORD=D1ymf8wyQEGthFR1E9xhCq
+DB_NAME=LTIdb
+```
+
+On **Windows**, prefer **`127.0.0.1`** over `localhost` in `DATABASE_URL` if `localhost` resolves to IPv6 (`::1`) and connections fail.
 
 **Frontend Environment** (`frontend/.env`):
 ```env
@@ -51,18 +59,30 @@ Start the PostgreSQL database using Docker Compose:
 
 ```bash
 # Start PostgreSQL container
-docker-compose up -d
+docker compose up -d
 
 # Verify the database is running
-docker-compose ps
+docker compose ps
 ```
 
 The PostgreSQL database will be available at:
-- **Host**: `localhost`
-- **Port**: `5432`
+- **Host**: `127.0.0.1` (recommended on Windows; see note above)
+- **Host port**: `5433` (maps to port **5432** inside the container)
 - **Database**: `LTIdb`
 - **Username**: `LTIdbUser`
-- **Password**: `D1ymf8wyQEGthFR1E9xhCq`
+- **Password**: `D1ymf8wyQEGthFR1E9xhCq` (same value as `POSTGRES_PASSWORD` in `docker-compose.yml`)
+
+**Fresh database (destructive):** removes the Postgres volume and reapplies migrations from scratch:
+
+```bash
+docker compose down -v
+docker compose up -d
+cd backend
+npm run prisma:generate
+npx prisma migrate deploy
+```
+
+**Full local reset (dev only, drops all data):** `npx prisma migrate reset` reapplies migrations and runs the seed script **only if** `package.json` defines a Prisma seed; this repository may not define one—check before relying on seeded data.
 
 ### 4. Backend Setup
 
@@ -76,11 +96,14 @@ npm install
 # Generate Prisma client
 npm run prisma:generate
 
-# Run database migrations
+# Apply migrations (production-style; use on empty or existing schema)
 npx prisma migrate deploy
 
-# (Optional) Seed the database with sample data
-npx prisma db seed
+# (Optional) Dev-only full reset: drops DB, reapplies migrations, runs seed if configured
+# npx prisma migrate reset
+
+# (Optional) Seed — only if prisma.seed is configured in package.json
+# npx prisma db seed
 
 # Start the development server
 npm run dev
@@ -135,6 +158,15 @@ npm run test:watch
 # Run tests with coverage
 npm run test:coverage
 ```
+
+**Database integration tests** (Prisma against a migrated PostgreSQL instance): ensure Docker `db` is running and `DATABASE_URL` uses host port **5433**, then:
+
+```bash
+cd backend
+npm run test:integration
+```
+
+On Windows, `npm run test:integration` uses `cross-env` to set `RUN_DB_INTEGRATION=true` so Jest runs `candidate.prisma.integration.test.ts`.
 
 ### Frontend Testing
 

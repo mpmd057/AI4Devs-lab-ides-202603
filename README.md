@@ -80,14 +80,14 @@ docker-compose up -d
 ```
 This will start a PostgreSQL database in a Docker container. The -d flag runs the container in detached mode, meaning it runs in the background.
 
-To access the PostgreSQL database, you can use any PostgreSQL client with the following connection details:
- - Host: localhost
- - Port: 5432
- - User: postgres
- - Password: password
- - Database: mydatabase
+To access the PostgreSQL database from the host machine, use the values in `docker-compose.yml` (not generic defaults). Typical local settings:
+ - Host: `127.0.0.1` (recommended on Windows if `localhost` causes IPv6 connection issues)
+ - Port: **5433** on the host (container listens on 5432 internally)
+ - User: `LTIdbUser`
+ - Password: same as `POSTGRES_PASSWORD` in `docker-compose.yml`
+ - Database: `LTIdb`
 
-Please replace User, Password, and Database with the actual user, password, and database name specified in your .env file.
+For Prisma and the backend, set **`DATABASE_URL`** in `backend/.env`, for example `postgresql://LTIdbUser:<password>@127.0.0.1:5433/LTIdb`. See `docs/development_guide.md` for the full setup and migration commands (`npm run prisma:generate`, `npx prisma migrate deploy`).
 
 To stop the Docker container, run the following command:
 ```
@@ -176,14 +176,7 @@ docker-compose up -d
 ```
 Esto iniciará una base de datos PostgreSQL en un contenedor Docker. La bandera -d corre el contenedor en modo separado, lo que significa que se ejecuta en segundo plano.
 
-Para acceder a la base de datos PostgreSQL, puedes usar cualquier cliente PostgreSQL con los siguientes detalles de conexión:
- - Host: localhost
- - Port: 5432
- - User: postgres
- - Password: password
- - Database: mydatabase
-
-Por favor, reemplaza User, Password y Database con el usuario, la contraseña y el nombre de la base de datos reales especificados en tu archivo .env.
+Use the same PostgreSQL connection details as in the English section above (`docker-compose.yml`, host port **5433**, `DATABASE_URL` in `backend/.env`, and `docs/development_guide.md`).
 
 Para detener el contenedor Docker, ejecuta el siguiente comando:
 ```
