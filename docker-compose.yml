@@ -9,4 +9,5 @@ services:
       POSTGRES_USER: LTIdbUser
       POSTGRES_DB: LTIdb
     ports:
-      - 5433:5432
+      # Host 5433 -> container 5432. Use 127.0.0.1 in DATABASE_URL (not localhost) on Windows if ::1 conflicts with other tools.
+      - "5433:5432"
