@@ -1,0 +1,1 @@
+../../specs/.commands/update-docs.md

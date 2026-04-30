@@ -8,6 +8,7 @@
         "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
         "build": "tsc",
         "test": "jest",
+        "test:integration": "cross-env RUN_DB_INTEGRATION=true jest --testPathPattern=candidate.prisma.integration",
         "prisma:init": "npx prisma init",
         "prisma:generate": "npx prisma generate",
         "start:prod": "npm run build && npm start"
@@ -27,6 +28,7 @@
         "@types/jest": "^29.5.12",
         "@types/node": "^20.12.10",
         "@types/supertest": "^6.0.2",
+        "cross-env": "^7.0.3",
         "eslint": "^9.2.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.1.3",

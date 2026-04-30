@@ -9,4 +9,4 @@ services:
       POSTGRES_USER: LTIdbUser
       POSTGRES_DB: LTIdb
     ports:
-      - 5432:5432
+      - 5433:5432
