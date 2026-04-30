@@ -183,3 +183,12 @@ npm run cypress:run
 npm run cypress:open
 ```
 
+## Git branching (sequential tickets)
+
+When work depends on a previous ticket (e.g. LTI-12 after LTI-11), avoid creating parallel feature branches from `main` that duplicate the same files.
+
+- **Branch from the latest integrated line**: create `feature/LTI-NN-*` from `main` after the previous ticket is merged, or branch from the open predecessor feature branch and merge/rebase before opening the next PR.
+- **One PR at a time into `main`**: merge ticket N before stacking N+1, unless you intentionally use stacked PRs with a clear base branch.
+- **Prefer small deltas**: if a branch accidentally re-copied an entire predecessor tree, extract only the real diff (e.g. `git diff predecessor..current`) and reapply it as commits on top of `main` instead of rebasing duplicate blobs.
+- **Use `git push --force-with-lease`** when you rewrite a remote feature branch after a rebase.
+
